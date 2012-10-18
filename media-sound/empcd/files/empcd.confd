@@ -1,0 +1,4 @@
+# /etc/conf.d/empcd: config file for /etc/init.d/empcd
+
+EMPCD_PID="/var/run/empcd.pid"
+EMPCD_USER="mpd"

@@ -1,5 +1,5 @@
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/media-sound/empcd/empcd-20071126.ebuild $
+# $Header: /var/cvsroot/gentoo-x86/media-sound/empcd/empcd-20080216.ebuild $
 
 DESCRIPTION="event music player client daemon"
 HOMEPAGE="http://unfix.org/projects/empcd/"
@@ -29,6 +29,7 @@ src_compile() {
 
 src_install() {
 	newinitd "${FILESDIR}"/empcd.initd empcd
+	newconfd "${FILESDIR}"/empcd.confd empcd
 	cd empcd-2008.02.16
 	emake DESTDIR="${D}" install || die "emake install failed."
 	echo "${D}"
