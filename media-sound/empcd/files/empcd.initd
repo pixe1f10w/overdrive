@@ -1,0 +1,25 @@
+#!/sbin/runscript
+
+EMPCD_PID="/var/run/empcd.pid"
+EMPCD_USER="mpd"
+
+# empcd can use network to connect to a remote MPD server
+# if we have MPD installed on the local machine wait until this one is started
+depend() {
+    use net
+    after mpd
+}
+
+start() {
+    ebegin "Starting event music player client daemon"
+    start-stop-daemon --start --make-pidfile --pidfile "${EMPCD_PID}" \
+        --background --exec /usr/sbin/empcd -- --nodaemonize --quiet \
+        --user "${EMPCD_USER}"
+}
+
+stop() {
+    ebegin "Stopping event music player client daemon"
+    start-stop-daemon --stop --pidfile "${EMPCD_PID}"
+}
+
+# implement restart call
