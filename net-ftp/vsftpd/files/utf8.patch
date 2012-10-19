@@ -1,0 +1,79 @@
+diff -Nuar ./vsftpd-2.0.6-patch/opts.c ./vsftpd-2.0.6-ext.2/opts.c
+--- ./vsftpd-2.0.6-patch/opts.c	2008-02-27 22:07:32.000000000 +0300
++++ ./vsftpd-2.0.6-ext.2/opts.c	2008-03-02 03:01:38.000000000 +0300
+@@ -10,18 +10,58 @@
+ #include "ftpcodes.h"
+ #include "ftpcmdio.h"
+ #include "session.h"
++#include "tunables.h"
++#include "charconv.h"
+ 
+ void
+ handle_opts(struct vsf_session* p_sess)
+ {
+-  str_upper(&p_sess->ftp_arg_str);
+-  if (str_equal_text(&p_sess->ftp_arg_str, "UTF8 ON"))
++  struct mystr opts = INIT_MYSTR;
++  struct mystr prm  = INIT_MYSTR;
++  
++  str_copy(&opts, &p_sess->ftp_arg_str);
++  str_upper(&opts);
++  str_split_char(&opts, &prm, ' ');
++  
++  if (str_equal_text(&opts, "UTF8"))
+   {
+-    vsf_cmdio_write(p_sess, FTP_OPTSOK, "Always in UTF8 mode.");
+-  }
++    if (str_equal_text(&prm, "ON"))
++    {
++      p_sess->remote_charset = vsf_charconv_codepage(VSFTP_CP_UTF8);
++      p_sess->enable_convertion = vsf_charconv_avail_convertion(tunable_local_codepage, p_sess->remote_charset);
++      vsf_cmdio_write(p_sess, FTP_OPTSOK, "UTF8 option is On.");
++    }
++    else
++    if (str_equal_text(&prm, "OFF"))
++    {
++      p_sess->remote_charset = tunable_remote_codepage;
++      p_sess->enable_convertion = vsf_charconv_avail_convertion(tunable_local_codepage, p_sess->remote_charset);
++      vsf_cmdio_write(p_sess, FTP_OPTSOK, "UTF8 option is Off.");
++    }
++    else
++    {
++      vsf_cmdio_write(p_sess, FTP_BADOPTS, "Invalid UTF8 option.");
++    }
++  } 
+   else
++  if (str_equal_text(&opts, "CP"))
++  {
++    if (vsf_charconv_avail_convertion(tunable_local_codepage, vsf_charconv_codepage(str_getbuf(&prm))))
++    {
++      vsf_cmdio_write(p_sess, FTP_OPTSOK, "Codepage changed.");
++      p_sess->remote_charset = vsf_charconv_codepage(str_getbuf(&prm));
++      p_sess->enable_convertion = 1;
++    }
++    else
++    {
++      vsf_cmdio_write(p_sess, FTP_BADOPTS, "Bad codepage defined");
++    }
++  }
++  else 
+   {
+     vsf_cmdio_write(p_sess, FTP_BADOPTS, "Option not understood.");
+   }
++  
++  str_free(&opts);
++  str_free(&prm);
+ }
+-
+diff -Nuar ./vsftpd-2.0.6-patch/vsftpver.h ./vsftpd-2.0.6-ext.2/vsftpver.h
+--- ./vsftpd-2.0.6-patch/vsftpver.h	2008-02-27 22:07:32.000000000 +0300
++++ ./vsftpd-2.0.6-ext.2/vsftpver.h	2008-03-02 03:00:27.000000000 +0300
+@@ -1,7 +1,7 @@
+ #ifndef VSF_VERSION_H
+ #define VSF_VERSION_H
+ 
+-#define VSF_VERSION "2.0.6+ (ext.1)"
++#define VSF_VERSION "2.0.6+ (ext.1-1)"
+ 
+ #endif /* VSF_VERSION_H */
+ 

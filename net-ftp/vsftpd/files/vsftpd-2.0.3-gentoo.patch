@@ -1,0 +1,24 @@
+--- tunables.c.orig	2005-06-08 11:29:01.261176985 +0100
++++ tunables.c	2005-06-08 11:30:33.521084952 +0100
+@@ -89,7 +89,7 @@
+ unsigned int tunable_max_per_ip = 0;
+ unsigned int tunable_trans_chunk_size = 0;
+ 
+-const char* tunable_secure_chroot_dir = "/usr/share/empty";
++const char* tunable_secure_chroot_dir = "/usr/share/vsftpd/empty";
+ const char* tunable_ftp_username = "ftp";
+ const char* tunable_chown_username = "root";
+ const char* tunable_xferlog_file = "/var/log/xferlog";
+--- vsftpd.conf.orig    2005-10-20 07:53:27.857892494 +0100
++++ vsftpd.conf 2005-10-20 09:44:04.631292771 +0100
+@@ -8,6 +8,10 @@
+ # Please read the vsftpd.conf.5 manual page to get a full idea of vsftpd's
+ # capabilities.
+ #
++# Listen on IPv4. xinet users must set NO or comment out
++# otherwise it must be set YES
++listen=YES
++#
+ # Allow anonymous FTP? (Beware - allowed by default if you comment this out).
+ anonymous_enable=YES
+ #
