@@ -29,7 +29,7 @@ pkg_setup() {
 src_install() {
 	addpredict "/etc/rvmrc"
 	addwrite "/etc/profile.d/rvm.sh"
-	$WORKDIR/$P/scripts/install --prefix "${D}/usr/local/" || die
+	$WORKDIR/$P/scripts/install --path "${D}/usr/local/" || die
 	insinto /etc/
 	doins "${FILESDIR}"/rvmrc
 }
